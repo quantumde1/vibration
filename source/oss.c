@@ -229,32 +229,40 @@ void* play_thread_func(void* arg) {
     fseek(wavFile, dataStartPos, SEEK_SET);
     
     unsigned char buffer[BUFFER_SIZE];
-    uint32_t totalBytes = 0;
     shouldStop = false;
     
-    while (!shouldStop && totalBytes < dataSize) {
-        uint32_t toRead = dataSize - totalBytes;
-        if (toRead > BUFFER_SIZE) {
-            toRead = BUFFER_SIZE;
-        }
+    while (!shouldStop) {
+        fseek(wavFile, dataStartPos, SEEK_SET);
+        uint32_t totalBytes = 0;
         
-        size_t bytesRead = fread(buffer, 1, toRead, wavFile);
-        if (bytesRead == 0) {
-            if (feof(wavFile)) {
-                break;
-            } else {
-                perror("error reading audio data");
+        while (!shouldStop && totalBytes < dataSize) {
+            uint32_t toRead = dataSize - totalBytes;
+            if (toRead > BUFFER_SIZE) {
+                toRead = BUFFER_SIZE;
+            }
+            
+            size_t bytesRead = fread(buffer, 1, toRead, wavFile);
+            if (bytesRead == 0) {
+                if (feof(wavFile)) {
+                    break;
+                } else {
+                    perror("error reading audio data");
+                    break;
+                }
+            }
+            
+            ssize_t bytesWritten = write(audioFd, buffer, bytesRead);
+            if (bytesWritten == -1) {
+                perror("error writing to audio device");
                 break;
             }
+            
+            totalBytes += bytesRead;
         }
         
-        ssize_t bytesWritten = write(audioFd, buffer, bytesRead);
-        if (bytesWritten == -1) {
-            perror("error writing to audio device");
+        if (shouldStop) {
             break;
         }
-        
-        totalBytes += bytesRead;
     }
     
     if (audioFd != -1) {
