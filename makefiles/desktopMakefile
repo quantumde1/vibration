@@ -1,0 +1,14 @@
+SRCS := $(shell find source -name '*.c*')
+OBJS := $(SRCS:.c=.o)
+
+CFLAGS := -fPIC -I$(PWD)/include -I/usr/local/include -g
+LDFLAGS := -shared -L/usr/local/lib
+
+%.o: %.c
+	clang $(CFLAGS) -c $< -o $@
+
+libvibration.so: $(OBJS)
+	clang $(LDFLAGS) $^ -o $@ -lm
+
+clean:
+	rm -f $(OBJS) libvibration.so

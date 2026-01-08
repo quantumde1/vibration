@@ -1,0 +1,7 @@
+*.so
+*.o
+*.dll
+/res/
+/assets/
+himmel_gl
+a.out
