@@ -1,26 +1,37 @@
-#ifdef WIN32
-
-#include "windows.h"
-#include "mmsystem.h"
+#ifdef _WIN32
 #include "../include/vibration.h"
+#include <windows.h>
+#include <mmsystem.h>
+#include <stdlib.h>
 
-LPCTSTR filename;
+static char* gFilename = NULL;
 
 int LoadMusic(const char* filePath) {
-    filename = TEXT(filePath);
-    return 0;
+    if (gFilename) {
+        free(gFilename);
+    }
+    
+    gFilename = _strdup(filePath);
+    return (gFilename != NULL) ? 0 : -1;
 }
-int PlayMusic() {
-    PlaySound(filename, NULL, SND_ASYNC | SND_LOOP);
+
+int PlayMusic(void) {
+    if (gFilename) {
+        return PlaySoundA(gFilename, NULL, SND_ASYNC | SND_LOOP) ? 0 : -1;
+    }
+    return -1;
+}
+
+int StopMusic(void) {
+    PlaySoundA(NULL, NULL, 0);
     return 0;
 }
 
-int StopMusic() {
-    PlaySound(NULL, NULL, 0);
-    return 0;
-}
-
-int UnloadMusic() {
+int UnloadMusic(void) {
+    if (gFilename) {
+        free(gFilename);
+        gFilename = NULL;
+    }
     return 0;
 }
 #endif

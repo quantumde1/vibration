@@ -14,6 +14,10 @@ case "$1" in
         ## going without anything, lmao
         gmake -f makefiles/desktopMakefile
         ;;
+    "windows")
+        ## going without anything, lmao
+        make -f makefiles/windowsMakefile
+        ;;
     "clean")
         make -f makefiles/desktopMakefile clean
         ;;

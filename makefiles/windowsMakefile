@@ -1,0 +1,15 @@
+SRCS := $(shell find source -name '*.c*')
+OBJS := $(SRCS:.c=.o)
+
+CFLAGS := -fPIC -Iinclude -I/mingw64/include -g
+LDFLAGS := -shared -L/mingw64/lib -lwinmm -lm
+
+%.o: %.c
+	gcc $(CFLAGS) -c $< -o $@
+
+# Создаем .dll вместо .so
+libvibration.dll: $(OBJS)
+	gcc $(LDFLAGS) $^ -o $@
+
+clean:
+	rm -f $(OBJS) libvibration.dll
